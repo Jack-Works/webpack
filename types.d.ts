@@ -4148,6 +4148,11 @@ declare interface ExportsSpec {
 	 */
 	dependencies?: Module[];
 }
+type ExportsType =
+	| "namespace"
+	| "default-only"
+	| "default-with-named"
+	| "dynamic";
 type Exposes = (string | ExposesObject)[] | ExposesObject;
 
 /**
@@ -7588,10 +7593,7 @@ declare class Module extends DependenciesBlock {
 	isProvided(exportName: string): null | boolean;
 	get exportsArgument(): string;
 	get moduleArgument(): string;
-	getExportsType(
-		moduleGraph: ModuleGraph,
-		strict?: boolean
-	): "namespace" | "default-only" | "default-with-named" | "dynamic";
+	getExportsType(moduleGraph: ModuleGraph, strict?: boolean): ExportsType;
 	addPresentationalDependency(presentationalDependency: Dependency): void;
 	addCodeGenerationDependency(codeGenerationDependency: Dependency): void;
 	addWarning(warning: WebpackError): void;
@@ -11312,7 +11314,7 @@ declare abstract class RuntimeTemplate {
 	supportsEcmaScriptModuleSyntax(): undefined | boolean;
 	supportTemplateLiteral(): undefined | boolean;
 	returningFunction(returnValue?: any, args?: string): string;
-	basicFunction(args?: any, body?: any): string;
+	basicFunction(args: string, body: string | string[]): string;
 	concatenation(...args: (string | { expr: string })[]): string;
 	expressionFunction(expression?: any, args?: string): string;
 	emptyFunction(): "x => {}" | "function() {}";
@@ -13726,6 +13728,7 @@ declare namespace exports {
 		export let definePropertyGetters: "__webpack_require__.d";
 		export let makeNamespaceObject: "__webpack_require__.r";
 		export let makeDeferredNamespaceObject: "__webpack_require__.z";
+		export let makeDeferredNamespaceObjectSymbol: "__webpack_require__.zS";
 		export let createFakeNamespaceObject: "__webpack_require__.t";
 		export let compatGetDefaultExport: "__webpack_require__.n";
 		export let harmonyModuleDecorator: "__webpack_require__.hmd";
@@ -13774,6 +13777,8 @@ declare namespace exports {
 		export let baseURI: "__webpack_require__.b";
 		export let relativeUrl: "__webpack_require__.U";
 		export let asyncModule: "__webpack_require__.a";
+		export let asyncModuleExportSymbol: "__webpack_require__.aE";
+		export let asyncModuleDoneSymbol: "__webpack_require__.aD";
 	}
 	export const UsageState: Readonly<{
 		Unused: 0;
